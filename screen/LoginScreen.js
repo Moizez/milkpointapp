@@ -35,9 +35,7 @@ export default class LoginScreen extends Component {
       try {
 
         if (this.state.user != null) {
-        alert(this.state.password)
-        alert(this.state.email)
-
+        
           if (this.state.user.perfil == 1) {
             const user = this.state.user;
             await AsyncStorage.setItem('@MilkPoint:id', JSON.stringify(user.id));
