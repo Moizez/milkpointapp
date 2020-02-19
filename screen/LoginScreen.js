@@ -14,28 +14,32 @@ export default class LoginScreen extends Component {
   login = async () => {
     if (this.state.email.trim().length == 0 || this.state.senha.trim().length == 0) {
       alert('Preencha o email e senha');
-    
+
     } else {
 
       let email = this.state.email;
       let password = this.state.senha;
 
-      const form = new FormData()
-      form.append("email", email);
-      form.append("senha", password);
-
-      const apiCall = await fetch('https://milkpoint.herokuapp.com/api/login', {
+      const data = {
         method: 'POST',
-        body: form
-      }); 
-      
-      const response = await apiCall.json();
-      this.setState({user: response})
-      
-      try {
+        body: JSON.stringify({
+          email: this.state.email,
+          password: this.state.senha,
+        }),
+        credentials: 'same-origin',
+        mode: 'same-origin',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'X-CSRFToken': 'csrftoken'
+        }
+      }
 
-        if (this.state.user != null) {
-        
+      const apiCall = await fetch('https://milkpoint.herokuapp.com/api/login', data);
+
+      try {
+        if (apiCall.status == 200) {
+          this.setState({ user: await apiCall.json() });
           if (this.state.user.perfil == 1) {
             const user = this.state.user;
             await AsyncStorage.setItem('@MilkPoint:id', JSON.stringify(user.id));
@@ -44,7 +48,7 @@ export default class LoginScreen extends Component {
             await AsyncStorage.setItem('@MilkPoint:cpf', JSON.stringify(user.cpf));
             await AsyncStorage.setItem('@MilkPoint:perfil', JSON.stringify(user.perfil));
             this.setState({ modalVisible: false });
-            
+
             this.props.navigation.navigate('StackProdutor');
           }
           else if (this.state.user.perfil == 2) {
@@ -68,7 +72,7 @@ export default class LoginScreen extends Component {
 
             this.props.navigation.navigate('StackLaticinio');
           }
-        } 
+        }
         else {
           alert("Email e/ou Senha invalido(s)")
         }
