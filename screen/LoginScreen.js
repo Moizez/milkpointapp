@@ -17,9 +17,6 @@ export default class LoginScreen extends Component {
 
     } else {
 
-      let email = this.state.email;
-      let password = this.state.senha;
-
       const data = {
         method: 'POST',
         body: JSON.stringify({
