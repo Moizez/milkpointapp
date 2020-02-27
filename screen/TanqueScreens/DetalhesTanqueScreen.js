@@ -66,6 +66,7 @@ export default class DetalhesTanqueScreen extends React.Component {
   };
 
   render() {
+
     return (
       <Container style={styles.container}>
         <View padder>
@@ -85,7 +86,7 @@ export default class DetalhesTanqueScreen extends React.Component {
             <CardItem bordered>
               <Body>
                 <Text>
-                  <Text style={styles.negrito}>Capacidade: </Text>{this.props.navigation.getParam('tanque').capacidade} Litros{'\n'}
+                  <Text style={styles.negrito}>Capacidade: </Text>{this.props.navigation.getParam('tanque').qtdAtual+this.props.navigation.getParam('tanque').qtdRestante} Litros{'\n'}
                   <Text style={styles.negrito}>Qtd. Atual: </Text>{this.props.navigation.getParam('tanque').qtdAtual} Litros{'\n'}
                   <Text style={styles.negrito}>Qtd. Restante: </Text>{this.props.navigation.getParam('tanque').qtdRestante} Litros
                 </Text>

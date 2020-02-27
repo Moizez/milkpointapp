@@ -57,14 +57,21 @@ export default class RelatorioScreen extends React.Component {
                         <Text style={styles.headerText}>Retiradas</Text>
                         {this.state.retiradas.map(retirada =>
                             <RetiradaResp key={retirada.id} quantidade={retirada.quantidade}
-                                laticinio={retirada.laticinio.nome} />
+                                laticinio={retirada.laticinio.nome} 
+                                status={retirada.confirmacao ? 'Confirmado': (
+                                    retirada.excluido ? 'Cancelado' : 'pendente'
+                                )} />
+
                         )}
                     </View>
                     <View style={styles.corpo}>
                         <Text style={styles.headerText}>Depositos</Text>
                         {this.state.depositos.map(deposito =>
                             <DepositoResp key={deposito.id} quantidade={deposito.quantidade}
-                                produtor={deposito.produtor.nome} />
+                                produtor={deposito.produtor.nome} 
+                                status={deposito.confirmacao ? 'Confirmado': (
+                                    deposito.excluido ? 'Cancelado' : 'pendente'
+                                )} />
                         )}
                     </View>
                 </ScrollView>

@@ -16,12 +16,15 @@ export default class HomeRespScreen extends React.Component {
     tanque: '',
     tanques: [],
     porcentagem: '',
+    qtdAtual: '',
+    capacidade: '',
+    tipo: ''
   };
 
   async componentDidMount() {
     const apiCall = await fetch('https://milkpoint.herokuapp.com/api/tanque');
     const response = await apiCall.json();
-
+    
     this.setState({
       responsavel: {
         id: await AsyncStorage.getItem("@MilkPoint:id"),
@@ -33,16 +36,23 @@ export default class HomeRespScreen extends React.Component {
     });
 
     this.state.tanques.forEach((tank, i) => {
+      
       if(tank.responsavel.id == this.state.responsavel.id) {
-        var p = (tank.qtdAtual*100)/tank.capacidade
-        this.setState({tanque: tank, porcentagem: p})
+        var a = tank.qtdAtual
+        var c = tank.qtdAtual+tank.qtdRestante
+        var p = (tank.qtdAtual*100/c)
+        p = p - (p%0.01)
+        var t = tank.tipo
+        this.setState({
+          tanque: tank, 
+          porcentagem: p, 
+          qtdAtual: a, 
+          capacidade: c,
+          tipo: t
+        })
       }
     });
-
-
-
   };
-
   render() {
     return (
       <Container style={styles.container}>
@@ -50,7 +60,10 @@ export default class HomeRespScreen extends React.Component {
           <Left>
             <Icon name='menu' onPress={() => this.props.navigation.openDrawer()} />
           </Left>
-          <Text style={styles.headerText}>MilkPoint</Text>
+            <Text style={styles.headerText}>MilkPoint{'\n'}
+              <Text style={{ fontSize: 18 }}>Módulo Tanque</Text>
+            </Text>
+    
           <View>
             <Image style={styles.logo} source={require('../../assets/images/logo.png')} />
           </View>
@@ -64,11 +77,15 @@ export default class HomeRespScreen extends React.Component {
               percent={this.state.porcentagem}
               radius={100}
               borderWidth={30}
-              color="#3399FF"
+
+              color={this.state.tipo == 'BOVINO'? "#3399FF":"#33FF99"}
               shadowColor="#999"
               bgColor='#E6E6E6'
             >
-              <Text style={{ fontSize: 18 }}>{this.state.porcentagem+'%'}</Text>
+              <Text style={{ fontSize: 14 }}>Tipo: {this.state.tipo}</Text>
+              <Text style={{ fontSize: 14 }}>Quantidade: {this.state.qtdAtual}</Text>
+              <Text style={{ fontSize: 14 }}>Capacidade: {this.state.capacidade}</Text>
+              <Text style={{ fontSize: 14 }}>{this.state.porcentagem}% preenchido</Text>
             </ProgressCircle>
           </TouchableOpacity>
         </View>

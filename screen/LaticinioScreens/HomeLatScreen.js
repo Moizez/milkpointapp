@@ -31,7 +31,9 @@ export default class HomeLatScreen extends React.Component {
           <Left>
             <Icon name='menu' onPress={() => this.props.navigation.openDrawer()} />
           </Left>
-          <Text style={styles.headerText}>Milk Point</Text>
+          <Text style={styles.headerText}>Milk Point{'\n'}
+              <Text style={{ fontSize: 18 }}>Módulo Laticínio</Text>
+            </Text>
           <View>
             <Image style={styles.logo} source={require('../../assets/images/logo.png')} />
           </View>
@@ -44,7 +46,7 @@ export default class HomeLatScreen extends React.Component {
               onPress={() => this.props.navigation.navigate('DetalhesTanqueLat', { tanque: tanque })}>
               <TanqueScreen nome={tanque.nome} qtdRestante={tanque.qtdRestante}
                 localizacao={tanque.localizacao} responsavel={tanque.responsavel.nome} 
-                qtdAtual={tanque.qtdAtual} capacidade={tanque.capacidade}/>
+                qtdAtual={tanque.qtdAtual} capacidade={tanque.qtdAtual+tanque.qtdRestante}/>
             </TouchableOpacity>)}
         </ScrollView>
       </Container>

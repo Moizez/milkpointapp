@@ -5,9 +5,12 @@ export default class DepositoResp extends React.Component {
 
     render() {
         return (
-            <View style={styles.box}>
+            <View style={this.props.status == 'Cancelado' ? styles.boxinativo : (
+                this.props.status == 'Confirmado'? styles.boxativo : styles.box
+                )}>
                 <Text style={styles.bold}>Quantidade: {this.props.quantidade}</Text>
                 <Text style={styles.bold}>Nome do Produtor: {this.props.produtor}</Text>
+                <Text style={styles.bold}>Status: {this.props.status}</Text>
             </View>
         );
     }
@@ -16,6 +19,22 @@ export default class DepositoResp extends React.Component {
 const styles = StyleSheet.create({
     box: {
         backgroundColor: '#FFF',
+        alignItems: 'center',
+        padding: 20,
+        margin: 20,
+        borderRadius: 5,
+    },
+
+    boxativo: {
+        backgroundColor: '#ACA',
+        alignItems: 'center',
+        padding: 20,
+        margin: 20,
+        borderRadius: 5,
+    },
+
+    boxinativo: {
+        backgroundColor: '#DAA',
         alignItems: 'center',
         padding: 20,
         margin: 20,

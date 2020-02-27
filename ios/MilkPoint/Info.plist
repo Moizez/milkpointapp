@@ -75,5 +75,7 @@
 		<string>SimpleLineIcons.ttf</string>
 		<string>Zocial.ttf</string>
 	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Este app precisa de acesso a sua localização...</string>
 </dict>
 </plist>
