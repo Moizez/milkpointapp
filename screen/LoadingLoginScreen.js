@@ -11,18 +11,23 @@ export default class LoadingLoginScreen extends React.Component {
     init = async () => {
 
       var email;
+      
       try{
-        email = await AsyncStorage.getItem("@MilkPoint:email");
-      }catch(exception){}
 
-      if(email){
-        if(email === 'responsavel@gmail.com'){
+        id = await AsyncStorage.getItem("@MilkPoint:id");
+        
+      }catch(exception){}
+      
+      if(id){
+        perfil = await AsyncStorage.getItem("@MilkPoint:perfil");
+        
+        if(perfil == 2){
           this.props.navigation.navigate('StackResponsavel');
         }
-        else if(email === 'produtor@gmail.com'){
+        else if(perfil == 1){
           this.props.navigation.navigate('StackProdutor');
         }
-        else if(email == 'laticinio@gmail.com'){
+        else if(perfil == 3){
             this.props.navigation.navigate('StackLaticinio');
         }
         else{

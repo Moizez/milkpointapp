@@ -1,8 +1,9 @@
 import React from 'react';
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, TouchableOpacity, Linking } from 'react-native';
 import { Container, Content, Accordion, Card, CardItem, Body, Text, View, Button, Icon, Fab } from 'native-base';
 import AsyncStorage from '@react-native-community/async-storage';
 import TanqueModal from '../../components/modals/TanqueModal';
+import GoogleStaticMap from 'react-native-google-static-map';
 
 export default class DetalhesTanqueScreen extends React.Component {
 
@@ -66,7 +67,11 @@ export default class DetalhesTanqueScreen extends React.Component {
   };
 
   render() {
-
+    var x, y;
+    var lati = this.props.navigation.getParam('tanque').latitude;
+    var long = this.props.navigation.getParam('tanque').longitude;
+    lati<0 ? x = (lati*-1)+"ºS" : x = lati+"ºN";
+    long<0 ? y = (long*-1)+"ºW" : y = long+"ºE";
     return (
       <Container style={styles.container}>
         <View padder>
@@ -95,10 +100,22 @@ export default class DetalhesTanqueScreen extends React.Component {
             <CardItem bordered>
               <Body>
                 <Text>
-                  <Text style={styles.negrito}>Descrição: </Text>{this.props.navigation.getParam('tanque').descricao}
-                </Text>
+                  <Text style={styles.negrito}>Descrição: </Text>{this.props.navigation.getParam('tanque').qtdAtual+this.props.navigation.getParam('tanque').descricao}
+                </Text> 
               </Body>
             </CardItem>
+            <CardItem bordered>
+              <TouchableOpacity onPress={ ()=>{ Linking.openURL('https://www.google.com/maps/place/'+x+'+'+y)}}>
+                <GoogleStaticMap
+                  style={styles.map} 
+                  latitude={lati}
+                  longitude={long}
+                  zoom={15}
+                  size={{ align: 'center', width: 300, height: 200 }}
+                  apiKey={'AIzaSyAt-XzTfI1v5NlSNnJensHSf9bWt-ittc8'}
+                />
+              </TouchableOpacity>
+          </CardItem>
           </Card>
         </View>
         <View style={{ flex: 1 }}>

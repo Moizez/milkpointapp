@@ -20,7 +20,7 @@ export default class LogoutScreen extends React.Component {
       }
     
     init = async () => {
-        await AsyncStorage.removeItem("@MilkPoint:email");
+        await AsyncStorage.clear();
         this.props.navigation.navigate('Login');
     };
 

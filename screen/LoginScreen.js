@@ -33,7 +33,7 @@ export default class LoginScreen extends Component {
       }
 
       const apiCall = await fetch('https://milkpoint.herokuapp.com/api/login', data);
-
+      
       try {
         if (apiCall.status == 200) {
           this.setState({ user: await apiCall.json() });
@@ -72,6 +72,7 @@ export default class LoginScreen extends Component {
         }
         else {
           alert("Email e/ou Senha invalido(s)")
+          alert(apiCall.status)
         }
 
 

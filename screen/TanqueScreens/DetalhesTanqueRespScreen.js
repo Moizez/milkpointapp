@@ -1,38 +1,63 @@
 import React from 'react';
-import { StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { Image, StyleSheet, TouchableOpacity, ScrollView, Linking } from 'react-native';
 import { Container, Content, Accordion, Card, CardItem, Body, Text, View, Button, Icon, Fab } from 'native-base';
 import AsyncStorage from '@react-native-community/async-storage';
-//import GetLocation from 'react-native-get-location'
-
+import GetLocation from 'react-native-get-location';
+import GoogleStaticMap from 'react-native-google-static-map';
 export default class DetalhesTanqueRespScreen extends React.Component {
+
 
   constructor(props) {
     super(props)
     this.state = {
       active: false,
       modalVisible: false,
-      responsavel: {
-        id: '',
-        nome: '',
-        email: '',
-        cpf: '',
-      },
     };
   }
 
-  /* getlocation(){
+  getlocation(){
     GetLocation.getCurrentPosition({
       enableHighAccuracy: true,
       timeout: 15000,
     })
     .then(location => {
-        alert(location);
+      //this.setState({latitude:location.latitude, longitude: location.longitude});
+      this.onConfirm(location);
+      this.render();  
     })
     .catch(error => {
         const { code, message } = error;
-        console.warn(code + ' - ' + message);
+        alert(error+':'+message);
     })
-  } */
+  }
+
+  onCllose = () => {
+    this.setState({ modalVisible: false });
+  };
+  onConfirm = async (location) => {
+    var idTanque = this.props.navigation.getParam('tanque').id;
+    //var idResp = this.props.navigation.getParam('tanque').responsavel.id;
+    const data = new FormData();
+    
+    data.append("latitude", location.latitude);
+    data.append("longitude", location.longitude);
+    const apiCall = await fetch('https://milkpoint.herokuapp.com/api/tanque/location/'+idTanque+'/'+location.latitude+"/"+location.longitude,
+    {
+      method: 'PUT',  
+      //body: data
+    })
+    
+    const response = apiCall.json();
+    
+    this.setState({
+      latitude: response.latitude,
+      longitude: response.longitude,
+      modalVisible: false
+    });
+    JSON.stringify(apiCall.status) == 200 ?
+    alert('Localização atualizada com sucesso!'):
+    Alert(JSON.stringify(apiCall.status));
+  }
 
   render() {
     
@@ -42,6 +67,12 @@ export default class DetalhesTanqueRespScreen extends React.Component {
     var c = a+r
     var p = a*100/c
     p = p-(p%0.01)
+    var x, y;
+    var lati = this.props.navigation.getParam('tanque').latitude;
+    var long = this.props.navigation.getParam('tanque').longitude;
+    lati<0 ? x = (lati*-1)+"ºS" : x = lati+"ºN";
+    long<0 ? y = (long*-1)+"ºW" : y = long+"ºE";
+
     return (
       <Container style={styles.container}>
         <View padder>
@@ -57,7 +88,7 @@ export default class DetalhesTanqueRespScreen extends React.Component {
                   <Text style={styles.negrito}>Capacidade: </Text>{c} Litros{'\n'}
                   <Text style={styles.negrito}>Qtd. Atual: </Text>{a} Litros{'\n'}
                   <Text style={styles.negrito}>Qtd. Restante: </Text>{r} Litros{'\n'}
-                  <Text style={styles.negrito}>Preenchido: </Text>{p}%                  
+                  <Text style={styles.negrito}>Preenchido: </Text>{p}%               
                 </Text>
               </Body>
             </CardItem>
@@ -68,13 +99,24 @@ export default class DetalhesTanqueRespScreen extends React.Component {
                 </Text>
               </Body>
             </CardItem>
+            <CardItem bordered>
+              <TouchableOpacity onPress={ ()=>{ Linking.openURL('https://www.google.com/maps/place/'+x+'+'+y)}}>
+                <GoogleStaticMap
+                  style={styles.map} 
+                  latitude={lati}
+                  longitude={long}
+                  zoom={15}
+                  size={{ align: 'center', width: 300, height: 200 }}
+                  apiKey={'AIzaSyAt-XzTfI1v5NlSNnJensHSf9bWt-ittc8'}
+                />
+              </TouchableOpacity>
+            </CardItem>
           </Card>
-          
         </View>
         <View style={{ flex: 1 }}>
           <Fab
             active={this.state.active}
-            direction="up"
+            direction="left"
             containerStyle={{}}
             style={{ backgroundColor: 'black' }}
             position="bottomRight"
@@ -85,6 +127,9 @@ export default class DetalhesTanqueRespScreen extends React.Component {
             </TouchableOpacity>
             <TouchableOpacity style={{backgroundColor: 'black'}} onPress={() => this.props.navigation.navigate('RetiradasPendentes')}>
                 <Icon>R</Icon>
+            </TouchableOpacity>
+            <TouchableOpacity style={{backgroundColor: 'black'}} onPress={() => this.getlocation()}>
+                <Icon>L</Icon>
             </TouchableOpacity>
           </Fab>
         </View>
@@ -105,6 +150,12 @@ const styles = StyleSheet.create({
 
   cardTanque: {
 
+  },
+
+  map: {
+    borderRadius: 5,
+    borderColor: 'black',
+    borderWidth: 1
   }
 
 });

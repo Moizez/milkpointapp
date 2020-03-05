@@ -139,6 +139,7 @@ const SwitchNavigator = createSwitchNavigator(
     StackProdutor: StackProdutor,
     StackLaticinio: StackLaticinio,
     LoadingLogin: LoadingLoginScreen,
+    Logout: LogoutScreen,
     Login: LoginScreen,
   },{
     initialRouteName: 'LoadingLogin',
