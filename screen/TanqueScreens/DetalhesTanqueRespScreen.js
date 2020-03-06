@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, StyleSheet, TouchableOpacity, ScrollView, Linking } from 'react-native';
+import { Image, StyleSheet, TouchableOpacity, Alert, ScrollView, Linking } from 'react-native';
 import { Container, Content, Accordion, Card, CardItem, Body, Text, View, Button, Icon, Fab } from 'native-base';
 import AsyncStorage from '@react-native-community/async-storage';
 import GetLocation from 'react-native-get-location';
@@ -31,9 +31,6 @@ export default class DetalhesTanqueRespScreen extends React.Component {
     })
   }
 
-  onCllose = () => {
-    this.setState({ modalVisible: false });
-  };
   onConfirm = async (location) => {
     var idTanque = this.props.navigation.getParam('tanque').id;
     //var idResp = this.props.navigation.getParam('tanque').responsavel.id;
@@ -58,6 +55,18 @@ export default class DetalhesTanqueRespScreen extends React.Component {
     alert('Localização atualizada com sucesso!'):
     Alert(JSON.stringify(apiCall.status));
   }
+
+  confirm() {
+    Alert.alert(
+      'Atualizar localização',
+      'Tem certeza que deseja atualizar a localiação do tanque com base na sua posição atual?',
+      [
+        {text: 'Confirmar', onPress: () => this.getlocation()},
+        {text: 'Cancelar', onPress: () => alert('operação cancelada!'), style: 'cancel'},
+      ]
+    );
+  }
+
 
   render() {
     
@@ -108,7 +117,7 @@ export default class DetalhesTanqueRespScreen extends React.Component {
                   zoom={15}
                   size={{ align: 'center', width: 300, height: 200 }}
                   apiKey={'AIzaSyAt-XzTfI1v5NlSNnJensHSf9bWt-ittc8'}
-                />
+                /> 
               </TouchableOpacity>
             </CardItem>
           </Card>
@@ -128,9 +137,9 @@ export default class DetalhesTanqueRespScreen extends React.Component {
             <TouchableOpacity style={{backgroundColor: 'black'}} onPress={() => this.props.navigation.navigate('RetiradasPendentes')}>
                 <Icon>R</Icon>
             </TouchableOpacity>
-            <TouchableOpacity style={{backgroundColor: 'black'}} onPress={() => this.getlocation()}>
-                <Icon>L</Icon>
-            </TouchableOpacity>
+            <TouchableOpacity style={{backgroundColor: 'black'}} onPress={() => this.confirm()}>
+              <Icon>L</Icon>
+            </TouchableOpacity>   
           </Fab>
         </View>
       </Container>

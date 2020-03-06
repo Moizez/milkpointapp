@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, Text, View, Alert, ScrollView, TouchableOpacity, Image } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import ProgressCircle from 'react-native-progress-circle';
 import { Icon, Button, Container, Header, Content, Left } from 'native-base';
@@ -15,7 +15,7 @@ export default class HomeRespScreen extends React.Component {
     },
     tanque: '',
     tanques: [],
-    porcentagem: '',
+    porcentagem: 0,
     qtdAtual: '',
     capacidade: '',
     tipo: ''
@@ -53,6 +53,7 @@ export default class HomeRespScreen extends React.Component {
       }
     });
   };
+
   render() {
     return (
       <Container style={styles.container}>

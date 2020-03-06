@@ -1,11 +1,13 @@
 import React from 'react';
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { Alert, StyleSheet, TouchableOpacity, Linking } from 'react-native';
 import { Container, Content, Accordion, Card, CardItem, Body, Text, View, Button, Icon, Fab } from 'native-base';
 import AsyncStorage from '@react-native-community/async-storage';
 import TanqueModal from '../../components/modals/TanqueModal';
+import GetLocation from 'react-native-get-location';
+import GoogleStaticMap from 'react-native-google-static-map';
 
 export default class DetalhesTanqueLatScreen extends React.Component {
-
+  
   constructor(props) {
     super(props)
     this.state = {
@@ -19,8 +21,25 @@ export default class DetalhesTanqueLatScreen extends React.Component {
       },
       papel: '',
       retiradas: [],
+      distancia: '',
     };
   }
+
+  distancia = (lati, long) => {
+    GetLocation.getCurrentPosition({
+      enableHighAccuracy: true,
+      timeout: 15000,
+    }).then( location => {
+      var dist = Math.sqrt(
+        Math.pow(lati-location.latitude, 2)+
+        Math.pow(long-location.longitude, 2)
+        )*111.045;
+      dist -= dist%0.001;
+      dist = dist<1 ? dist=(dist*1000)+'m' : dist+"km";
+      this.setState({'distancia': dist});
+    })
+  } 
+  
 
   openModal = () => {
     this.setState({ modalVisible: !this.state.modalVisible });
@@ -33,13 +52,14 @@ export default class DetalhesTanqueLatScreen extends React.Component {
   async componentDidMount() {
     this.setState({
       laticinio: {
-      id: await AsyncStorage.getItem("@MilkPoint:id"),
-      nome: await AsyncStorage.getItem("@MilkPoint:nome"),
-      email: await AsyncStorage.getItem("@MilkPoint:email"),
-      cnpj: await AsyncStorage.getItem("@MilkPoint:cnpj"),
+        id: await AsyncStorage.getItem("@MilkPoint:id"),
+        nome: await AsyncStorage.getItem("@MilkPoint:nome"),
+        email: await AsyncStorage.getItem("@MilkPoint:email"),
+        cnpj: await AsyncStorage.getItem("@MilkPoint:cnpj"),
       },
       papel: await AsyncStorage.getItem("@MilkPoint:papel")
     })  
+    
   }
 
   onAdd = async (quantidadeTitle) => {
@@ -94,7 +114,31 @@ export default class DetalhesTanqueLatScreen extends React.Component {
     await AsyncStorage.setItem('@MilkPoint:retiradas', JSON.stringify(this.state.retiradas));
   };
 
+  confirm(total) {
+    Alert.alert(
+      'Retirada Total',
+      'Tem certeza que deseja solicita a tirada total de '+total+' litros do tanque?',
+      [
+        {text: 'Confirmar', onPress: () => this.onTotal()},
+        {text: 'Cancelar', onPress: () => alert('operação cancelada!'), style: "{color:'red'}" },
+      ]
+    );
+  }
+
+
   render() {
+    var t = this.props.navigation.getParam('tanque').tipo
+    var a = this.props.navigation.getParam('tanque').qtdAtual
+    var r = this.props.navigation.getParam('tanque').qtdRestante
+    var c = a+r
+    var p = a*100/c
+    p = p-(p%0.01)
+    var x, y;
+    var lati = this.props.navigation.getParam('tanque').latitude;
+    var long = this.props.navigation.getParam('tanque').longitude;
+    lati<0 ? x = (lati*-1)+"ºS" : x = lati+"ºN";
+    long<0 ? y = (long*-1)+"ºW" : y = long+"ºE";
+    var dist = this.state.distancia == '' ? this.distancia(lati,long) : this.state.distancia;
     return (
       <Container style={styles.container}>
         <View padder>
@@ -116,8 +160,8 @@ export default class DetalhesTanqueLatScreen extends React.Component {
                 <Text>
                 <Text style={styles.negrito}>Capacidade: </Text>{this.props.navigation.getParam('tanque').qtdAtual+this.props.navigation.getParam('tanque').qtdRestante} Litros{'\n'}
                   <Text style={styles.negrito}>Qtd. Atual: </Text>{this.props.navigation.getParam('tanque').qtdAtual} Litros{'\n'}
-                  <Text style={styles.negrito}>Qtd. Restante: </Text>{this.props.navigation.getParam('tanque').qtdRestante} Litros
-                </Text>
+                  <Text style={styles.negrito}>Qtd. Restante: </Text>{this.props.navigation.getParam('tanque').qtdRestante} Litros{'\n'}
+                  <Text style={styles.negrito}>Distancia estimada: </Text>{this.state.distancia}</Text>
               </Body>
             </CardItem>
             <CardItem bordered>
@@ -127,12 +171,24 @@ export default class DetalhesTanqueLatScreen extends React.Component {
                 </Text>
               </Body>
             </CardItem>
+            <CardItem bordered>
+              <TouchableOpacity onPress={ ()=>{ Linking.openURL('https://www.google.com/maps/place/'+x+'+'+y)}}>
+                <GoogleStaticMap
+                  style={styles.map} 
+                  latitude={lati}
+                  longitude={long}
+                  zoom={15}
+                  size={{ align: 'center', width: 300, height: 200 }}
+                  apiKey={'AIzaSyAt-XzTfI1v5NlSNnJensHSf9bWt-ittc8'}
+                /> 
+              </TouchableOpacity>
+            </CardItem>
           </Card>
         </View>
         <View style={{ flex: 1 }}>
             <Fab
               active={this.state.active}
-              direction="up"
+              direction="left"
               containerStyle={{}}
               style={{ backgroundColor: 'black' }}
               position="bottomRight"
@@ -141,7 +197,7 @@ export default class DetalhesTanqueLatScreen extends React.Component {
               <Button style={{backgroundColor: 'black'}} onPress={() => this.setState({modalVisible: true, active: false})}>
                 <Icon>P</Icon>
               </Button>
-              <Button style={{backgroundColor: 'black'}} onPress={() => this.onTotal()}>
+              <Button style={{backgroundColor: 'black'}} onPress={() => this.confirm()}>
                 <Icon>T</Icon>
               </Button>
             </Fab>
@@ -169,6 +225,10 @@ const styles = StyleSheet.create({
 
   cardTanque: {
 
+  },
+
+  cancel: {
+    color: '#F00'
   }
 
 });
