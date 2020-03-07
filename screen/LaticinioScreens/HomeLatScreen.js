@@ -1,7 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
-import ProgressCircle from 'react-native-progress-circle';
 import { Icon, Button, Container, Header, Content, Left } from 'native-base';
 import TanqueScreen from '../TanqueScreens/TanqueScreen';
 
@@ -32,8 +31,8 @@ export default class HomeLatScreen extends React.Component {
             <Icon name='menu' onPress={() => this.props.navigation.openDrawer()} />
           </Left>
           <Text style={styles.headerText}>Milk Point{'\n'}
-              <Text style={{ fontSize: 18 }}>Módulo Laticínio</Text>
-            </Text>
+            <Text style={{ fontSize: 18 }}>Módulo Laticínio</Text>
+          </Text>
           <View>
             <Image style={styles.logo} source={require('../../assets/images/logo.png')} />
           </View>

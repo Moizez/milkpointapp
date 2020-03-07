@@ -3,9 +3,9 @@ import { StyleSheet, Text, View, Alert, ScrollView, TouchableOpacity, Image } fr
 import AsyncStorage from '@react-native-community/async-storage';
 import ProgressCircle from 'react-native-progress-circle';
 import { Icon, Button, Container, Header, Content, Left } from 'native-base';
+import * as Config from '../../app.json';
 
 export default class HomeRespScreen extends React.Component {
-
   state = {
     responsavel: {
       id: '',
@@ -21,38 +21,27 @@ export default class HomeRespScreen extends React.Component {
     tipo: ''
   };
 
-  async componentDidMount() {
-    const apiCall = await fetch('https://milkpoint.herokuapp.com/api/tanque');
+  async componentDidMount() {    
+    const apiCall = await fetch(Config.baseUrl+'/api/tanque');
     const response = await apiCall.json();
     
+    //response.array.forEach(tanque => {
+    //  tanque.capacidade = tanque.qtdAtual+qtdRestante;
+    //  var p = tanque.capacidade/tanque.qtdAtual*100;
+    //  tanque.porcentagem = p-(p%0.01)
+    //});
     this.setState({
+      tanques: response,
       responsavel: {
         id: await AsyncStorage.getItem("@MilkPoint:id"),
         nome: await AsyncStorage.getItem("@MilkPoint:nome"),
         email: await AsyncStorage.getItem("@MilkPoint:email"),
         cpf: await AsyncStorage.getItem("@MilkPoint:cpf"),
       },
-      tanques: response,
     });
-
-    this.state.tanques.forEach((tank, i) => {
-      
-      if(tank.responsavel.id == this.state.responsavel.id) {
-        var a = tank.qtdAtual
-        var c = tank.qtdAtual+tank.qtdRestante
-        var p = (tank.qtdAtual*100/c)
-        p = p - (p%0.01)
-        var t = tank.tipo
-        this.setState({
-          tanque: tank, 
-          porcentagem: p, 
-          qtdAtual: a, 
-          capacidade: c,
-          tipo: t
-        })
-      }
-    });
-  };
+    await AsyncStorage.setItem('@MilkPoint:tanques', JSON.stringify(tanques));
+    
+  }
 
   render() {
     return (
@@ -61,35 +50,42 @@ export default class HomeRespScreen extends React.Component {
           <Left>
             <Icon name='menu' onPress={() => this.props.navigation.openDrawer()} />
           </Left>
-            <Text style={styles.headerText}>MilkPoint{'\n'}
-              <Text style={{ fontSize: 18 }}>Módulo Tanque</Text>
-            </Text>
-    
+          <Text style={styles.headerText}>MilkPoint{'\n'}
+            <Text style={{ fontSize: 18 }}>Módulo Tanque</Text>
+          </Text>
           <View>
             <Image style={styles.logo} source={require('../../assets/images/logo.png')} />
           </View>
         </Header>
         <View style={{ borderBottomColor: '#A4A4A4', borderBottomWidth: 1 }} />
-        <View style={styles.circleProgress}>
-          <Text style={styles.title}>Tanque {this.state.tanque.nome}</Text>
-          <TouchableOpacity onPress={() => 
-            this.props.navigation.navigate('DetalhesTanqueResp', {tanque: this.state.tanque})}>
-            <ProgressCircle
-              percent={this.state.porcentagem}
-              radius={100}
-              borderWidth={30}
-
-              color={this.state.tipo == 'BOVINO'? "#3399FF":"#33FF99"}
-              shadowColor="#999"
-              bgColor='#E6E6E6'
-            >
-              <Text style={{ fontSize: 14 }}>Tipo: {this.state.tipo}</Text>
-              <Text style={{ fontSize: 14 }}>Quantidade: {this.state.qtdAtual}</Text>
-              <Text style={{ fontSize: 14 }}>Capacidade: {this.state.capacidade}</Text>
-              <Text style={{ fontSize: 14 }}>{this.state.porcentagem}% preenchido</Text>
-            </ProgressCircle>
-          </TouchableOpacity>
-        </View>
+        <ScrollView ontentInsetAdjustmentBehavior="automatic" style={styles.scrollView}>
+          {this.state.tanques.map(tanque => 
+              //if(tanque.responsavel.id == this.state.responsavel.id) {
+            <View style={styles.circleProgress}>
+              <Text style={styles.title}>Tanque {tanque.nome}</Text>
+              <TouchableOpacity onPress={() => 
+                this.props.navigation.navigate('DetalhesTanqueResp', {tanque: tanque})}>
+                <ProgressCircle
+                  percent={
+                    tanque.qtdAtual/tanque.qtdRestante*100
+                  }
+                  radius={100}
+                  borderWidth={30}
+                  color={this.state.tipo == 'BOVINO'? "#3399FF":"#33FF99"}
+                  shadowColor="#999"
+                  bgColor='#E6E6E6'
+                >
+                  <Text style={{ fontSize: 14 }}>Tipo: {tanque.tipo}</Text>
+                  <Text style={{ fontSize: 14 }}>Quantidade: {tanque.qtdAtual}</Text>
+                  <Text style={{ fontSize: 14 }}>Capacidade: {tanque.qtdAtual+tanque.qtdRestante}</Text>
+                  <Text style={{ fontSize: 14 }}> {Math.round(tanque.qtdAtual/tanque.qtdRestante*100)}% preenchido</Text>
+                  
+                </ProgressCircle>
+              </TouchableOpacity>
+            </View>
+            //}
+          )}
+        </ScrollView>
       </Container>
     );
   }

@@ -8,10 +8,11 @@ export default class TanqueScreen extends React.Component {
         return (
             <View style={styles.boxTanque}>
                 <View>
-                    <Text style={styles.bold}>Nome do Tanque:</Text><Text> {this.props.nome}</Text>
-                    <Text style={styles.bold}>Restante:</Text><Text> {this.props.qtdRestante}</Text>
-                    <Text style={styles.bold}>Localização:</Text><Text> {this.props.localizacao}</Text>
-                    <Text style={styles.bold}>Responsavel:</Text><Text> {this.props.responsavel}</Text>
+                    <Text><Text style={styles.bold}>Nome do Tanque: </Text> {this.props.nome}</Text>
+                    <Text><Text style={styles.bold}>Qtd Atual:</Text> {this.props.qtdAtual}</Text>
+                    <Text><Text style={styles.bold}>Cap Livre:</Text> {this.props.qtdRestante}</Text>
+                    <Text style={styles.bold}>Endereço:</Text><Text>{this.props.localizacao}</Text>
+                    <Text style={styles.bold}>Responsavel:</Text><Text>{this.props.responsavel}</Text>
                 </View>
                 <View style={styles.speedometer}>
                     <Speedometer
@@ -42,7 +43,7 @@ const styles = StyleSheet.create({
         alignItems: 'stretch',
         borderColor: '#A4A4A4',
         borderWidth: 1,
-        padding: 20,
+        padding: 10,
         margin: 10,
     },
 
@@ -56,7 +57,6 @@ const styles = StyleSheet.create({
     speedometer: {
         justifyContent: "center",
         paddingLeft: 13,
-
     },
 
 

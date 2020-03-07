@@ -4,6 +4,9 @@ import { Container, Content, Accordion, Card, CardItem, Body, Text, View, Button
 import AsyncStorage from '@react-native-community/async-storage';
 import GetLocation from 'react-native-get-location';
 import GoogleStaticMap from 'react-native-google-static-map';
+import * as Config from '../../app.json';
+import { geoInterpolate } from 'd3';
+
 export default class DetalhesTanqueRespScreen extends React.Component {
 
 
@@ -12,48 +15,66 @@ export default class DetalhesTanqueRespScreen extends React.Component {
     this.state = {
       active: false,
       modalVisible: false,
+      distancia: '',
+      latitude: '',
+      longitude: ''
     };
   }
 
+  distancia = (lati, long) => {
+    GetLocation.getCurrentPosition({
+      enableHighAccuracy: true,
+      timeout: 15000,
+    }).then( location => {
+      var dist = Math.sqrt(
+        Math.pow(lati-location.latitude, 2)+
+        Math.pow(long-location.longitude, 2)
+        )*111.045;
+      dist -= dist%0.001;
+      dist = dist<1 ? dist=(dist*1000)+'m' : dist+"km";
+      this.setState({'distancia': dist});
+    })
+  } 
+
   getlocation(){
+    let location = {};
     GetLocation.getCurrentPosition({
       enableHighAccuracy: true,
       timeout: 15000,
     })
-    .then(location => {
-      //this.setState({latitude:location.latitude, longitude: location.longitude});
+    .then( location => {
+      //alert(JSON.stringify(location));
       this.onConfirm(location);
-      this.render();  
     })
     .catch(error => {
         const { code, message } = error;
         alert(error+':'+message);
-    })
+    });
   }
 
   onConfirm = async (location) => {
     var idTanque = this.props.navigation.getParam('tanque').id;
     //var idResp = this.props.navigation.getParam('tanque').responsavel.id;
     const data = new FormData();
-    
     data.append("latitude", location.latitude);
     data.append("longitude", location.longitude);
-    const apiCall = await fetch('https://milkpoint.herokuapp.com/api/tanque/location/'+idTanque+'/'+location.latitude+"/"+location.longitude,
+    fetch(Config.baseUrl+'/api/tanque/location/'+idTanque+'/'+location.latitude+"/"+location.longitude,
     {
       method: 'PUT',  
       //body: data
     })
-    
-    const response = apiCall.json();
-    
-    this.setState({
-      latitude: response.latitude,
-      longitude: response.longitude,
-      modalVisible: false
-    });
-    JSON.stringify(apiCall.status) == 200 ?
-    alert('Localização atualizada com sucesso!'):
-    Alert(JSON.stringify(apiCall.status));
+    .then(apiCall => {
+      this.setState({
+        latitude: location.latitude,
+        longitude: location.longitude,
+      });
+      this.distancia(location.latitude, location.longitude);
+      JSON.stringify(apiCall.status) == 200 ?
+      alert('Localização atualizada com sucesso!'):
+      alert(JSON.stringify(apiCall.status) );
+      
+      this.render();
+    })
   }
 
   confirm() {
@@ -65,6 +86,7 @@ export default class DetalhesTanqueRespScreen extends React.Component {
         {text: 'Cancelar', onPress: () => alert('operação cancelada!'), style: 'cancel'},
       ]
     );
+    this.render();
   }
 
 
@@ -77,8 +99,8 @@ export default class DetalhesTanqueRespScreen extends React.Component {
     var p = a*100/c
     p = p-(p%0.01)
     var x, y;
-    var lati = this.props.navigation.getParam('tanque').latitude;
-    var long = this.props.navigation.getParam('tanque').longitude;
+    var lati = (this.state.latitude == '' ? this.props.navigation.getParam('tanque').latitude : this.state.latitude)
+    var long = (this.state.longitude == '' ? this.props.navigation.getParam('tanque').longitude : this.state.longitude)
     lati<0 ? x = (lati*-1)+"ºS" : x = lati+"ºN";
     long<0 ? y = (long*-1)+"ºW" : y = long+"ºE";
 
@@ -96,19 +118,17 @@ export default class DetalhesTanqueRespScreen extends React.Component {
                   <Text style={styles.negrito}>Tipo: </Text>{t}{'\n'}
                   <Text style={styles.negrito}>Capacidade: </Text>{c} Litros{'\n'}
                   <Text style={styles.negrito}>Qtd. Atual: </Text>{a} Litros{'\n'}
-                  <Text style={styles.negrito}>Qtd. Restante: </Text>{r} Litros{'\n'}
-                  <Text style={styles.negrito}>Preenchido: </Text>{p}%               
-                </Text>
-              </Body>
-            </CardItem>
-            <CardItem bordered>
-              <Body>
-                <Text>
+                  <Text style={styles.negrito}>Qtd. Livre: </Text>{r} Litros{'\n'}
+                  <Text style={styles.negrito}>Preenchido: </Text>{p}%{'\n'}
                   <Text style={styles.negrito}>Descrição: </Text>{this.props.navigation.getParam('tanque').descricao}
                 </Text>
               </Body>
             </CardItem>
-            <CardItem bordered>
+            <CardItem bordered 
+              style={lati*long == 0 ? {display: 'none'} : {}}
+            >
+              <Body>
+              <Text style={styles.negrito}>Distancia estimada: <Text>{this.state.distancia == '' ? this.distancia(lati,long) : this.state.distancia}</Text></Text>
               <TouchableOpacity onPress={ ()=>{ Linking.openURL('https://www.google.com/maps/place/'+x+'+'+y)}}>
                 <GoogleStaticMap
                   style={styles.map} 
@@ -117,8 +137,9 @@ export default class DetalhesTanqueRespScreen extends React.Component {
                   zoom={15}
                   size={{ align: 'center', width: 300, height: 200 }}
                   apiKey={'AIzaSyAt-XzTfI1v5NlSNnJensHSf9bWt-ittc8'}
-                /> 
+                />
               </TouchableOpacity>
+              </Body>
             </CardItem>
           </Card>
         </View>
@@ -134,12 +155,15 @@ export default class DetalhesTanqueRespScreen extends React.Component {
             <TouchableOpacity style={{backgroundColor: 'black'}} onPress={() => this.props.navigation.navigate('DepositosPendentes')}>
                 <Icon>D</Icon>
             </TouchableOpacity>
-            <TouchableOpacity style={{backgroundColor: 'black'}} onPress={() => this.props.navigation.navigate('RetiradasPendentes')}>
+            <TouchableOpacity style={{backgroundColor: 'black'}}  onPress={() => this.props.navigation.navigate('RetiradasPendentes')}>
                 <Icon>R</Icon>
             </TouchableOpacity>
-            <TouchableOpacity style={{backgroundColor: 'black'}} onPress={() => this.confirm()}>
+            <TouchableOpacity 
+              style={lati*long == 0 ? {backgroundColor: 'black'} : {display: 'none', backgroundColor: 'black'}}
+              onPress={() => this.confirm()}>
               <Icon>L</Icon>
-            </TouchableOpacity>   
+            </TouchableOpacity>
+               
           </Fab>
         </View>
       </Container>
