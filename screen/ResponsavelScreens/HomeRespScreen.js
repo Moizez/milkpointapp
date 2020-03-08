@@ -3,10 +3,14 @@ import { StyleSheet, Text, View, Alert, ScrollView, TouchableOpacity, Image } fr
 import AsyncStorage from '@react-native-community/async-storage';
 import ProgressCircle from 'react-native-progress-circle';
 import { Icon, Button, Container, Header, Content, Left } from 'native-base';
+import Spinner from 'react-native-loading-spinner-overlay';
 import * as Config from '../../app.json';
+import { treemapSlice } from 'd3';
+
 
 export default class HomeRespScreen extends React.Component {
   state = {
+    spinner: false,
     responsavel: {
       id: '',
       nome: '',
@@ -22,14 +26,10 @@ export default class HomeRespScreen extends React.Component {
   };
 
   async componentDidMount() {    
+    this.setState({spinner: true});
     const apiCall = await fetch(Config.baseUrl+'/api/tanque');
     const response = await apiCall.json();
     
-    //response.array.forEach(tanque => {
-    //  tanque.capacidade = tanque.qtdAtual+qtdRestante;
-    //  var p = tanque.capacidade/tanque.qtdAtual*100;
-    //  tanque.porcentagem = p-(p%0.01)
-    //});
     this.setState({
       tanques: response,
       responsavel: {
@@ -39,13 +39,22 @@ export default class HomeRespScreen extends React.Component {
         cpf: await AsyncStorage.getItem("@MilkPoint:cpf"),
       },
     });
-    await AsyncStorage.setItem('@MilkPoint:tanques', JSON.stringify(tanques));
+    
+    
+    await AsyncStorage.setItem('@MilkPoint:tanques', JSON.stringify(response));
+    this.setState({spinner: false});
     
   }
 
   render() {
+    
     return (
       <Container style={styles.container}>
+        <Spinner
+          visible={this.state.spinner}
+          textContent={'Aguarde...'}
+          textStyle={styles.spinnerTextStyle}
+        />
         <Header style={styles.header}>
           <Left>
             <Icon name='menu' onPress={() => this.props.navigation.openDrawer()} />
@@ -60,14 +69,14 @@ export default class HomeRespScreen extends React.Component {
         <View style={{ borderBottomColor: '#A4A4A4', borderBottomWidth: 1 }} />
         <ScrollView ontentInsetAdjustmentBehavior="automatic" style={styles.scrollView}>
           {this.state.tanques.map(tanque => 
-              //if(tanque.responsavel.id == this.state.responsavel.id) {
+            
             <View style={styles.circleProgress}>
               <Text style={styles.title}>Tanque {tanque.nome}</Text>
               <TouchableOpacity onPress={() => 
                 this.props.navigation.navigate('DetalhesTanqueResp', {tanque: tanque})}>
                 <ProgressCircle
                   percent={
-                    tanque.qtdAtual/tanque.qtdRestante*100
+                    tanque.qtdAtual/(tanque.qtdAtual+tanque.qtdRestante)*100
                   }
                   radius={100}
                   borderWidth={30}
@@ -78,7 +87,7 @@ export default class HomeRespScreen extends React.Component {
                   <Text style={{ fontSize: 14 }}>Tipo: {tanque.tipo}</Text>
                   <Text style={{ fontSize: 14 }}>Quantidade: {tanque.qtdAtual}</Text>
                   <Text style={{ fontSize: 14 }}>Capacidade: {tanque.qtdAtual+tanque.qtdRestante}</Text>
-                  <Text style={{ fontSize: 14 }}> {Math.round(tanque.qtdAtual/tanque.qtdRestante*100)}% preenchido</Text>
+                  <Text style={{ fontSize: 14 }}> {Math.round(tanque.qtdAtual/(tanque.qtdAtual+tanque.qtdRestante)*100)}% preenchido</Text>
                   
                 </ProgressCircle>
               </TouchableOpacity>

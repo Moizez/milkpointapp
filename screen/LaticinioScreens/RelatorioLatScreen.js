@@ -61,6 +61,11 @@ export default class RelatorioLatScreen extends React.Component {
 };
 
 const styles = StyleSheet.create({
+  icon: {
+    width: 35,
+    height: 35,
+},
+
     container: {
       flex: 1,
       backgroundColor: '#E6E6E6',

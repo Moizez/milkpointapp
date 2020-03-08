@@ -18,7 +18,7 @@
     "react-native": "0.61.2",
     "react-native-get-location": "^1.4.2",
     "react-native-google-static-map": "^0.1.13",
-
+    "react-native-loading-spinner-overlay": "^1.1.0",
     "react-native-progress-circle": "^2.1.0",
     "react-native-simple-dialogs": "^1.2.1",
     "react-native-speedometer-chart": "^0.7.3",

@@ -4,8 +4,8 @@ import { Container, Content, Accordion, Card, CardItem, Body, Text, View, Button
 import AsyncStorage from '@react-native-community/async-storage';
 import GetLocation from 'react-native-get-location';
 import GoogleStaticMap from 'react-native-google-static-map';
+import Spinner from 'react-native-loading-spinner-overlay';
 import * as Config from '../../app.json';
-import { geoInterpolate } from 'd3';
 
 export default class DetalhesTanqueRespScreen extends React.Component {
 
@@ -13,6 +13,7 @@ export default class DetalhesTanqueRespScreen extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
+      spinner: false,
       active: false,
       modalVisible: false,
       distancia: '',
@@ -20,7 +21,7 @@ export default class DetalhesTanqueRespScreen extends React.Component {
       longitude: ''
     };
   }
-
+  
   distancia = (lati, long) => {
     GetLocation.getCurrentPosition({
       enableHighAccuracy: true,
@@ -37,7 +38,7 @@ export default class DetalhesTanqueRespScreen extends React.Component {
   } 
 
   getlocation(){
-    let location = {};
+    
     GetLocation.getCurrentPosition({
       enableHighAccuracy: true,
       timeout: 15000,
@@ -45,14 +46,17 @@ export default class DetalhesTanqueRespScreen extends React.Component {
     .then( location => {
       //alert(JSON.stringify(location));
       this.onConfirm(location);
+      
     })
     .catch(error => {
         const { code, message } = error;
         alert(error+':'+message);
     });
+    
   }
 
   onConfirm = async (location) => {
+    this.setState({ spinner: true });
     var idTanque = this.props.navigation.getParam('tanque').id;
     //var idResp = this.props.navigation.getParam('tanque').responsavel.id;
     const data = new FormData();
@@ -72,14 +76,15 @@ export default class DetalhesTanqueRespScreen extends React.Component {
       JSON.stringify(apiCall.status) == 200 ?
       alert('Localização atualizada com sucesso!'):
       alert(JSON.stringify(apiCall.status) );
-      
       this.render();
+      this.setState({ spinner: false });
     })
   }
 
   confirm() {
     Alert.alert(
       'Atualizar localização',
+      'ATENÇÃO: após a confirmação, só será possível alterar a localização do tanque com altorização do administrador do sistema. \n'+
       'Tem certeza que deseja atualizar a localiação do tanque com base na sua posição atual?',
       [
         {text: 'Confirmar', onPress: () => this.getlocation()},
@@ -106,6 +111,11 @@ export default class DetalhesTanqueRespScreen extends React.Component {
 
     return (
       <Container style={styles.container}>
+        <Spinner
+          visible={this.state.spinner}
+          textContent={'Aguarde...'}
+          textStyle={styles.spinnerTextStyle}
+        />
         <View padder>
           <Card>
             <CardItem header bordered>
@@ -132,10 +142,10 @@ export default class DetalhesTanqueRespScreen extends React.Component {
               <TouchableOpacity onPress={ ()=>{ Linking.openURL('https://www.google.com/maps/place/'+x+'+'+y)}}>
                 <GoogleStaticMap
                   style={styles.map} 
-                  latitude={lati}
-                  longitude={long}
+                  latitude={lati+' '}
+                  longitude={long+' '}
                   zoom={15}
-                  size={{ align: 'center', width: 300, height: 200 }}
+                  size={{ width: 300, height: 200 }}
                   apiKey={'AIzaSyAt-XzTfI1v5NlSNnJensHSf9bWt-ittc8'}
                 />
               </TouchableOpacity>
