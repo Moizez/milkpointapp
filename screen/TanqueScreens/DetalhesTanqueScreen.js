@@ -116,42 +116,31 @@ export default class DetalhesTanqueScreen extends React.Component {
                 <Text>
                   <Text style={styles.negrito}>Endereço: </Text>{this.props.navigation.getParam('tanque').localizacao}{'\n'}
                   <Text style={styles.negrito}>Responsável: </Text>{this.props.navigation.getParam('tanque').responsavel.nome}
-                </Text>
-              </Body>
-            </CardItem>
-            <CardItem bordered>
-              <Body>
-                <Text>
-                <Text style={styles.negrito}>Capacidade: </Text>{c} Litros{'\n'}
+                  <Text style={styles.negrito}>Capacidade: </Text>{c} Litros{'\n'}
                   <Text style={styles.negrito}>Qtd. Atual: </Text>{a} Litros{'\n'}
                   <Text style={styles.negrito}>Qtd. Livre: </Text>{r} Litros{'\n'}
                   <Text style={styles.negrito}>Preenchido: </Text>{p}%{'\n'}
-                  <Text style={styles.negrito}>Distancia estimada: </Text>{this.state.distancia}
-                </Text>
-              </Body>
-            </CardItem>
-            <CardItem bordered>
-              <Body>
-                <Text>
                   <Text style={styles.negrito}>Descrição: </Text>{this.props.navigation.getParam('tanque').qtdAtual+this.props.navigation.getParam('tanque').descricao}
                 </Text> 
               </Body>
             </CardItem>
-            <CardItem bordered>
+            <CardItem bordered 
+              style={lati*long == 0 ? {display: 'none'} : {}}
+            >
               <Body>
-                <Text style={styles.negrito}>Localização: {'\n'}</Text>
-                <TouchableOpacity onPress={ ()=>{ Linking.openURL('https://www.google.com/maps/place/'+x+'+'+y)}}>
-                  <GoogleStaticMap
-                    style={styles.map} 
-                    latitude={lati}
-                    longitude={long}
-                    zoom={15}
-                    size={{ align: 'center', width: 300, height: 200 }}
-                    apiKey={Config.apiKey}
-                  />
-                </TouchableOpacity>
+              <Text style={styles.negrito}>Distancia estimada: <Text>{this.state.distancia == '' ? this.distancia(lati,long) : this.state.distancia}</Text></Text>
+              <TouchableOpacity onPress={ ()=>{ Linking.openURL('https://www.google.com/maps/place/'+x+'+'+y)}}>
+                <GoogleStaticMap
+                  style={styles.map} 
+                  latitude={lati+' '}
+                  longitude={long+' '}
+                  zoom={15}
+                  size={{ width: 300, height: 200 }}
+                  apiKey={'AIzaSyAt-XzTfI1v5NlSNnJensHSf9bWt-ittc8'}
+                />
+              </TouchableOpacity>
               </Body>
-          </CardItem>
+            </CardItem>
           </Card>
         </View>
         <View style={{ flex: 1 }}>
