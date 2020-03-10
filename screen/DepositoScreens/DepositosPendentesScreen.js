@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image } from 'rea
 import AsyncStorage from '@react-native-community/async-storage';
 import { Icon, Button, Container, Header, Content, Left } from 'native-base';
 import DepositoScreen from './DepositoScreen';
+import * as Config from '../../app.json'
 
 
 export default class DepositosPendentesScreen extends React.Component {
@@ -20,7 +21,7 @@ export default class DepositosPendentesScreen extends React.Component {
 
   async componentDidMount() {
 
-    const apiCall = await fetch('https://milkpoint.herokuapp.com/api/deposito/listapendentes')
+    const apiCall = await fetch(Config.baseUrl+'/api/deposito/listapendentes')
     const response = await apiCall.json();
 
     this.setState({depositos: response});
@@ -40,7 +41,7 @@ export default class DepositosPendentesScreen extends React.Component {
     data.append("confirmacao", confirmacao);
     data.append("idDeposito", idDeposito);
 
-    const apiCall = await fetch('https://milkpoint.herokuapp.com/api/deposito/confirmacao',
+    const apiCall = await fetch(Config.baseUrl+'/api/deposito/confirmacao',
     {
       method: 'POST',
       body: data

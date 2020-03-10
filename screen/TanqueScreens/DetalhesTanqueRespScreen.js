@@ -146,7 +146,7 @@ export default class DetalhesTanqueRespScreen extends React.Component {
                   longitude={long+' '}
                   zoom={15}
                   size={{ width: 300, height: 200 }}
-                  apiKey={'AIzaSyAt-XzTfI1v5NlSNnJensHSf9bWt-ittc8'}
+                  apiKey={Config.apiKey}
                 />
               </TouchableOpacity>
               </Body>

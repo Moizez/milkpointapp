@@ -1,6 +1,7 @@
 {
   "name": "MilkPoint",
   "displayName": "MilkPoint",
-  "baseUrl": "http://milkpoint.herokuapp.com",
+  //"baseUrl": "http://milkpoint.herokuapp.com",
+  "baseUrl": "http://192.168.1.3:8080",
   "apiKey": "AIzaSyAt-XzTfI1v5NlSNnJensHSf9bWt-ittc8"
 }

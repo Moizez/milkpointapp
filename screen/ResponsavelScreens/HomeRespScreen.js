@@ -5,8 +5,6 @@ import ProgressCircle from 'react-native-progress-circle';
 import { Icon, Button, Container, Header, Content, Left } from 'native-base';
 import Spinner from 'react-native-loading-spinner-overlay';
 import * as Config from '../../app.json';
-import { treemapSlice } from 'd3';
-
 
 export default class HomeRespScreen extends React.Component {
   state = {
@@ -27,7 +25,10 @@ export default class HomeRespScreen extends React.Component {
 
   async componentDidMount() {    
     this.setState({spinner: true});
-    const apiCall = await fetch(Config.baseUrl+'/api/tanque');
+    const apiCall = await fetch(
+      Config.baseUrl+'/api/responsavel/'+
+      await AsyncStorage.getItem("@MilkPoint:id")+
+      '/tanques');
     const response = await apiCall.json();
     
     this.setState({
