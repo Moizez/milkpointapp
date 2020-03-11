@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image } from 'rea
 import AsyncStorage from '@react-native-community/async-storage';
 import { Icon, Button, Container, Header, Content, Left } from 'native-base';
 import RetiradaScreen from './RetiradaScreen';
+import * as Config from '../../app.json'
 
 
 export default class RetiradaPendentesScreen extends React.Component {
@@ -20,7 +21,7 @@ export default class RetiradaPendentesScreen extends React.Component {
 
   async componentDidMount() {
 
-    const apiCall = await fetch('https://milkpoint.herokuapp.com/api/retirada/listapendentes')
+    const apiCall = await fetch(Config.baseUrl+'/api/retirada/listapendentes')
     const response = await apiCall.json();
 
     this.setState({retiradas: response});
@@ -40,7 +41,7 @@ export default class RetiradaPendentesScreen extends React.Component {
     data.append("confirmacao", confirmacao);
     data.append("idRetirada", idRetirada);
 
-    const apiCall = await fetch('https://milkpoint.herokuapp.com/api/retirada/confirmacao',
+    const apiCall = await fetch(Config.baseUrl+'/api/retirada/confirmacao',
     {
       method: 'POST',
       body: data
@@ -66,6 +67,7 @@ export default class RetiradaPendentesScreen extends React.Component {
   render() {
     return (
       <Container style={styles.container}>
+        <View><Text>Retiradas Pendentes</Text></View>
         <ScrollView ontentInsetAdjustmentBehavior="automatic" style={styles.scrollView}>
             {this.state.retiradas.map(retirada =>
                 <View>

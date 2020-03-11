@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image } from 'rea
 import AsyncStorage from '@react-native-community/async-storage';
 import { Icon, Button, Container, Header, Content, Left } from 'native-base';
 import TanqueScreen from '../TanqueScreens/TanqueScreen';
+import * as Config from '../../app.json'
 
 export default class HomeLatScreen extends React.Component {
 
@@ -11,7 +12,7 @@ export default class HomeLatScreen extends React.Component {
   };
 
   async componentDidMount() {
-    const apiCall = await fetch('https://milkpoint.herokuapp.com/api/tanque');
+    const apiCall = await fetch(Config.baseUrl+'/api/tanque');
     const response = await apiCall.json();
 
     this.setState({

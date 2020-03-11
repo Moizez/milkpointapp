@@ -30,7 +30,6 @@ export default class HomeRespScreen extends React.Component {
       await AsyncStorage.getItem("@MilkPoint:id")+
       '/tanques');
     const response = await apiCall.json();
-    
     this.setState({
       tanques: response,
       responsavel: {
@@ -40,7 +39,6 @@ export default class HomeRespScreen extends React.Component {
         cpf: await AsyncStorage.getItem("@MilkPoint:cpf"),
       },
     });
-    
     
     await AsyncStorage.setItem('@MilkPoint:tanques', JSON.stringify(response));
     this.setState({spinner: false});
@@ -70,7 +68,6 @@ export default class HomeRespScreen extends React.Component {
         <View style={{ borderBottomColor: '#A4A4A4', borderBottomWidth: 1 }} />
         <ScrollView ontentInsetAdjustmentBehavior="automatic" style={styles.scrollView}>
           {this.state.tanques.map(tanque => 
-            
             <View style={styles.circleProgress}>
               <Text style={styles.title}>Tanque {tanque.nome}</Text>
               <TouchableOpacity onPress={() => 

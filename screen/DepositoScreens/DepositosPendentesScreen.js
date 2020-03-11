@@ -65,6 +65,7 @@ export default class DepositosPendentesScreen extends React.Component {
   render() {
     return (
       <Container style={styles.container}>
+        <View><Text>Depósitos Pendentes</Text></View>
         <ScrollView ontentInsetAdjustmentBehavior="automatic" style={styles.scrollView}>
             {this.state.depositos.map(deposito =>
                 <View>

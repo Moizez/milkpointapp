@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet, Text, View, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import { Body, Button, Container, Header, Content, Left, CardItem } from 'native-base';
 import * as Config from '../../app.json'
@@ -21,40 +21,38 @@ export default class NotificationScreen extends React.Component {
     }
 
     async componentDidMount() {
-
         const apiCall = await fetch(
             Config.baseUrl+'/api/responsavel/'+
             await AsyncStorage.getItem("@MilkPoint:id")+
             '/notificacoes'
         )
-        const response = await apiCall.json();
-    
+        JSON.stringify(apiCall.status) == 200 ?
+        response = await apiCall.json() :
+        response = {};
+
         this.setState({notificacoes: response});
- 
     }
     
     render() {
         return (
             <Container style={styles.container}>
                 <ScrollView ontentInsetAdjustmentBehavior="automatic" style={styles.scrollView}>
-                    {this.state.notificacoes.map(notificacao =>
-                        <View >
-                            <TouchableOpacity style={styles.boxTanque} onPress={() => {
-                                        //notificacao.laticinio == null ? 
-                                        this.props.navigation.navigate('DepositosPendentes') 
-                                        //</View>/this.props.navigation.navigate('RetiradasPendentes') 
-                                    }
-                                }>
-                                <Body>
-                                    <Text>
-                                        <Text>Você tem um novo pedido de </Text><Text style={styles.negrito}>{notificacao.laticinio == null ? 'DEPÓSITO' : 'RETIRADA'} {'\n'}</Text>
-                                        <Text style={styles.negrito}>Tanque: </Text><Text> {notificacao.tanque.nome}{'\n'}</Text>
-                                        <Text style={styles.negrito}>Quantidade: </Text><Text> {notificacao.quantidade}{'\n'}</Text>
-                                        <Text style={styles.negrito}>Solicitante: </Text><Text> {notificacao.laticinio == null ? notificacao.produtor.nome : notificacao.leticinio.nome}</Text>
-                                    </Text>
-                                </Body>
-                            </TouchableOpacity>
-                        </View>
+                    {this.state.notificacoes.map(notificacao => 
+                        <TouchableOpacity  style={styles.box} onPress={ () => 
+                            this.props.navigation.navigate(
+                                notificacao.tipo == 'RETIRADA' ?
+                                'RetiradasPendentes' :
+                                'DepositosPendentes'
+                                )
+                            }
+                        >
+                            <Text>
+                                Você tem um novo pedido de <Text style={styles.negrito}>{notificacao.tipo}</Text>{'\n'}
+                                Tanque: <Text style={styles.negrito}>{notificacao.tanque}</Text>{'\n'}
+                                Qauntidade: <Text style={styles.negrito}>{notificacao.quantidade}</Text> Litros{'\n'}
+                                Solicitante: <Text style={styles.negrito}>{notificacao.solicitante}</Text>
+                            </Text>
+                        </TouchableOpacity>
                     )}
                 </ScrollView>
             </Container>
@@ -111,7 +109,7 @@ const styles = StyleSheet.create({
         paddingTop: 20,
     },
 
-    boxTanque: {
+    box: {
         backgroundColor: '#FFF',
         borderRadius: 5,
         alignItems: 'stretch',
