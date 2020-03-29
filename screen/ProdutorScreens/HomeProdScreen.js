@@ -17,6 +17,15 @@ export default class HomeProdScreen extends React.Component {
     }
   };
 
+  static navigationOptions = {
+    drawerLabel: 'Home',
+    drawerIcon: ({ tintColor }) => (
+        <Image
+            style={styles.icon}
+            source={require('../../assets/images/home.png')}
+        />
+    ),
+  }
   async componentDidMount() {
     const apiCall = await fetch(Config.baseUrl+'/api/tanque');
     const response = await apiCall.json();
@@ -102,5 +111,11 @@ const styles = StyleSheet.create({
 
   scrollView: {
     paddingTop: 20,
-  }
+  },
+
+  icon: {
+    width: 35,
+    height: 35,
+  },
+
 });

@@ -23,6 +23,16 @@ export default class HomeRespScreen extends React.Component {
     tipo: ''
   };
 
+  static navigationOptions = {
+    drawerLabel: 'Home',
+    drawerIcon: ({ tintColor }) => (
+        <Image
+            style={styles.icon}
+            source={require('../../assets/images/home.png')}
+        />
+    ),
+}
+
   async componentDidMount() {    
     this.setState({spinner: true});
     const apiCall = await fetch(
@@ -145,5 +155,11 @@ const styles = StyleSheet.create({
     fontSize: 30,
     padding: 10,
     fontWeight: 'bold',
-  }
+  },
+
+  icon: {
+    width: 35,
+    height: 35,
+  },
+
 });

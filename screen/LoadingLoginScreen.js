@@ -10,7 +10,7 @@ export default class LoadingLoginScreen extends React.Component {
   
     init = async () => {
 
-      var email;
+      var id;
       
       try{
 
@@ -20,17 +20,14 @@ export default class LoadingLoginScreen extends React.Component {
       
       if(id){
         perfil = await AsyncStorage.getItem("@MilkPoint:perfil");
-        
-        if(perfil == 2){
-          this.props.navigation.navigate('StackResponsavel');
-        }
-        else if(perfil == 1){
+      
+        if(perfil == 1){
           this.props.navigation.navigate('StackProdutor');
-        }
-        else if(perfil == 3){
-            this.props.navigation.navigate('StackLaticinio');
-        }
-        else{
+        } else if(perfil == 2){
+          this.props.navigation.navigate('StackResponsavel');
+        } else if(perfil == 3){
+          this.props.navigation.navigate('StackLaticinio');
+        } else{
           this.props.navigation.navigate('Login');
         }
       }else{

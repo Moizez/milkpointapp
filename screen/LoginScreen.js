@@ -1,22 +1,26 @@
 import React, { Component } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Image, TextInput } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
+import Spinner from 'react-native-loading-spinner-overlay';
+import * as Config from '../app.json';
 
 export default class LoginScreen extends Component {
 
   state = {
+    spinner: false,
     email: '',
     senha: '',
     user: null,
     modalVisible: false,
+    sms: false,
+    telefone: '' 
   };
 
   login = async () => {
     if (this.state.email.trim().length == 0 || this.state.senha.trim().length == 0) {
       alert('Preencha o email e senha');
-
     } else {
-
+      this.state.spinner = true;
       const data = {
         method: 'POST',
         body: JSON.stringify({
@@ -32,60 +36,60 @@ export default class LoginScreen extends Component {
         }
       }
 
-      const apiCall = await fetch('https://milkpoint.herokuapp.com/api/login', data);
+      const apiCall = await fetch(Config.baseUrl+'/api/login', data);
       
       try {
+        
         if (apiCall.status == 200) {
+          
           this.setState({ user: await apiCall.json() });
-          if (this.state.user.perfil == 1) {
-            const user = this.state.user;
-            await AsyncStorage.setItem('@MilkPoint:id', JSON.stringify(user.id));
-            await AsyncStorage.setItem('@MilkPoint:nome', JSON.stringify(user.nome));
-            await AsyncStorage.setItem('@MilkPoint:email', JSON.stringify(user.email));
+          const user = this.state.user;
+          await AsyncStorage.setItem('@MilkPoint:id', JSON.stringify(user.id));
+          await AsyncStorage.setItem('@MilkPoint:nome', JSON.stringify(user.nome));
+          await AsyncStorage.setItem('@MilkPoint:email', JSON.stringify(user.email));
+          await AsyncStorage.setItem('@MilkPoint:perfil', JSON.stringify(user.perfil));
+          
+          perfil = await AsyncStorage.getItem("@MilkPoint:perfil");
+          
+          if(perfil == 1){
             await AsyncStorage.setItem('@MilkPoint:cpf', JSON.stringify(user.cpf));
-            await AsyncStorage.setItem('@MilkPoint:perfil', JSON.stringify(user.perfil));
             this.setState({ modalVisible: false });
-
             this.props.navigation.navigate('StackProdutor');
-          }
-          else if (this.state.user.perfil == 2) {
-            const user = this.state.user;
-            await AsyncStorage.setItem('@MilkPoint:id', JSON.stringify(user.id));
-            await AsyncStorage.setItem('@MilkPoint:nome', JSON.stringify(user.nome));
-            await AsyncStorage.setItem('@MilkPoint:email', JSON.stringify(user.email));
+          } else if(perfil == 2){
             await AsyncStorage.setItem('@MilkPoint:cpf', JSON.stringify(user.cpf));
-            await AsyncStorage.setItem('@MilkPoint:perfil', JSON.stringify(user.perfil));
-
-            this.props.navigation.navigate('StackResponsavel');
-          }
-          else if (this.state.user.perfil == 3) {
-            const user = this.state.user;
-            await AsyncStorage.setItem('@MilkPoint:id', JSON.stringify(user.id));
-            await AsyncStorage.setItem('@MilkPoint:nome', JSON.stringify(user.nome));
-            await AsyncStorage.setItem('@MilkPoint:email', JSON.stringify(user.email));
-            await AsyncStorage.setItem('@MilkPoint:cnpj', JSON.stringify(user.cnpj));
-            await AsyncStorage.setItem('@MilkPoint:perfil', JSON.stringify(user.perfil))
+            await AsyncStorage.setItem('@MilkPoint:telefone', JSON.stringify(user.telefone));
+            await AsyncStorage.setItem('@MilkPoint:sendSms', JSON.stringify(user.sms));
             this.setState({ modalVisible: false });
-
+            this.props.navigation.navigate('StackResponsavel');
+          } else if(perfil == 3){
+            await AsyncStorage.setItem('@MilkPoint:cnpj', JSON.stringify(user.cnpj));
+            this.setState({ modalVisible: false });
             this.props.navigation.navigate('StackLaticinio');
+          } else{
+            alert("Erro ao efetuar Login")
           }
         }
         else {
           alert("Email e/ou Senha invalido(s)")
-          alert(apiCall.status)
         }
-
 
       } catch (erro) {
         this.setState({ modalVisible: false });
         alert('Erro tentando fazer o login: ' + erro);
       }
+      this.state.spinner = false;
     }
+    
   };
 
   render() {
     return (
       <View style={styles.container}>
+        <Spinner
+            visible={this.state.spinner}
+            textContent={'Fazendo Login \n Aguarde...'}
+            textStyle={styles.spinnerTextStyle}
+            />
         <View>
           <View style={styles.boxContainer}>
             <Image style={styles.imagem} source={require('../assets/images/logo.png')} />
@@ -173,5 +177,10 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     fontSize: 20,
     fontWeight: 'bold',
+  },
+
+  spinnerTextStyle : {
+    backgroundColor: 'white',
+    fontSize: 20,
   },
 });

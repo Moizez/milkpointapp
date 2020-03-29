@@ -1,8 +1,9 @@
 import React from 'react';
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
-import { Body, Button, Container, Header, Content, Left, CardItem } from 'native-base';
-import * as Config from '../../app.json'
+import { Body, Button, Container, Header, Icon, Content, Left, CardItem } from 'native-base';
+import Spinner from 'react-native-loading-spinner-overlay';
+import * as Config from '../../app.json';
 
 export default class NotificationScreen extends React.Component {
 
@@ -28,14 +29,29 @@ export default class NotificationScreen extends React.Component {
         )
         JSON.stringify(apiCall.status) == 200 ?
         response = await apiCall.json() :
-        response = {};
-
+        response = [];
         this.setState({notificacoes: response});
     }
     
     render() {
         return (
             <Container style={styles.container}>
+                <Spinner
+                    visible={this.state.spinner}
+                    textContent={'Aguarde...'}
+                    textStyle={styles.spinnerTextStyle}
+                    />
+                <Header style={styles.header}>
+                <Left>
+                    <Icon name='menu' onPress={() => this.props.navigation.openDrawer()} />
+                </Left>
+                <Text style={styles.headerText}>MilkPoint{'\n'}
+                    <Text style={{ fontSize: 18 }}>Notificações</Text>
+                </Text>
+                <View>
+                    <Image style={styles.logo} source={require('../../assets/images/logo.png')} />
+                </View>
+                </Header>
                 <ScrollView ontentInsetAdjustmentBehavior="automatic" style={styles.scrollView}>
                     {this.state.notificacoes.map(notificacao => 
                         <TouchableOpacity  style={styles.box} onPress={ () => 
@@ -121,6 +137,11 @@ const styles = StyleSheet.create({
 
     negrito: {
         fontWeight: 'bold',
+    },
+
+    icon: {
+        width: 35,
+        height: 35,
     },
     
 });
