@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@react-native-community/async-storage": "^1.6.2",
-    "d3": "^5.12.0",
+    "d3": "^7.6.1",
     "link": "^0.1.5",
     "native-base": "^2.13.8",
     "react": "16.9.0",
@@ -24,7 +24,7 @@
     "react-native-speedometer-chart": "^0.7.3",
     "react-native-svg": "^9.13.3",
     "react-navigation": "^2.18.3",
-    "recharts": "^1.8.5"
+    "recharts": "^2.1.14"
   },
   "devDependencies": {
     "@babel/core": "^7.6.4",
